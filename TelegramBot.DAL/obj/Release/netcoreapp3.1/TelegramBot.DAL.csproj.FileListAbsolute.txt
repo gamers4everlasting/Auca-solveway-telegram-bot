@@ -1,0 +1,12 @@
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\bin\Release\netcoreapp3.1\TelegramBot.DAL.deps.json
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\bin\Release\netcoreapp3.1\TelegramBot.DAL.runtimeconfig.json
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\bin\Release\netcoreapp3.1\TelegramBot.DAL.runtimeconfig.dev.json
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\bin\Release\netcoreapp3.1\TelegramBot.DAL.dll
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\bin\Release\netcoreapp3.1\TelegramBot.DAL.pdb
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\obj\Release\netcoreapp3.1\TelegramBot.DAL.csprojAssemblyReference.cache
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\obj\Release\netcoreapp3.1\TelegramBot.DAL.csproj.CoreCompileInputs.cache
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\obj\Release\netcoreapp3.1\TelegramBot.DAL.AssemblyInfoInputs.cache
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\obj\Release\netcoreapp3.1\TelegramBot.DAL.AssemblyInfo.cs
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\obj\Release\netcoreapp3.1\TelegramBot.DAL.dll
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\obj\Release\netcoreapp3.1\TelegramBot.DAL.pdb
+D:\Work\TelegramBot\TelegramBot\TelegramBot.DAL\obj\Release\netcoreapp3.1\TelegramBot.DAL.genruntimeconfig.cache

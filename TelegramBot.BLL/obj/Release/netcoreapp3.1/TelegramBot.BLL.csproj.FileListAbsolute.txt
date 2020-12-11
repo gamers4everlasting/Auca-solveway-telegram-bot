@@ -1,0 +1,12 @@
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\bin\Release\netcoreapp3.1\TelegramBot.BLL.deps.json
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\bin\Release\netcoreapp3.1\TelegramBot.BLL.dll
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\bin\Release\netcoreapp3.1\TelegramBot.BLL.pdb
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\bin\Release\netcoreapp3.1\TelegramBot.DAL.dll
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\bin\Release\netcoreapp3.1\TelegramBot.DAL.pdb
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\obj\Release\netcoreapp3.1\TelegramBot.BLL.csprojAssemblyReference.cache
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\obj\Release\netcoreapp3.1\TelegramBot.BLL.csproj.CoreCompileInputs.cache
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\obj\Release\netcoreapp3.1\TelegramBot.BLL.AssemblyInfoInputs.cache
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\obj\Release\netcoreapp3.1\TelegramBot.BLL.AssemblyInfo.cs
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\obj\Release\netcoreapp3.1\TelegramBot.BLL.csproj.CopyComplete
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\obj\Release\netcoreapp3.1\TelegramBot.BLL.dll
+D:\Work\TelegramBot\TelegramBot\TelegramBot.BLL\obj\Release\netcoreapp3.1\TelegramBot.BLL.pdb
