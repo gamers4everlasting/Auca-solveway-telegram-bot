@@ -10,5 +10,6 @@ namespace TelegramBot.BLL.Helpers
         DbProblemDiagram,
         DbProblemCorrectResult,
         DbProblemSolve,
+        DbSubmissions
     }
 }

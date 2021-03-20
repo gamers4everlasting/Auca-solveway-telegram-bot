@@ -5,11 +5,8 @@ using System.Text;
 
 namespace TelegramBot.DAL.Entities
 {
-    public interface IEntityBase<TKey> : IEntityBase
+    public interface IEntityBase<TKey>
     {
         TKey Id { get; set; }
-    }
-    public interface IEntityBase : IDeletionTrackable, IModificationTrackable, ICreationTrackable
-    {
     }
 }

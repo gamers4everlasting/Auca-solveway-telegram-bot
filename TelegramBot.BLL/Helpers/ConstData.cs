@@ -6,6 +6,6 @@ namespace TelegramBot.BLL.Helpers
 {
     public static class ConstData
     {
-        public static int TotalItemsAmountForList = 5;
+        public const int TotalItemsAmountForList = 5;
     }
 }

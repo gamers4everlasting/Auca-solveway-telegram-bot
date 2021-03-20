@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using TelegramBot.BLL.Helpers.Enums;
 
 namespace TelegramBot.BLL.Models.Generics
 {
@@ -12,8 +15,18 @@ namespace TelegramBot.BLL.Models.Generics
         public long ChatId { get; set; }
         public int ReplyToMessageId { get; set; }
         public InlineKeyboardMarkup InlineKeyboardMarkup { get; set; }
-        public bool? UpdateMessage { get; set; } //null if nothing changed
+        public ResponseTypeEnum? ResponseType { get; set; } //TODO: structure better, what uses what.
         public int UpdatingMessageId { get; set; }
         public ParseMode ParseMode { get; set; }
+        public IReplyMarkup ReplyKeyboardMarkup { get; set; }
+        public FileStream ImageStream { get; set; }
+        public bool DisableWebPagePreview { get; set; } = true;
+
+        public Response()
+        {
+            ImageStream = null;
+            ResponseType = null;
+        }
+        
     }
 }

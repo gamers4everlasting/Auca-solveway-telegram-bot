@@ -10,6 +10,7 @@ using TelegramBot.BLL.Services;
 using TelegramBot.DAL.EF;
 using TelegramBot.DAL.Entities;
 using TelegramBot.DAL.Enums;
+using System;
 
 namespace TelegramBot.Controllers
 {
@@ -27,8 +28,15 @@ namespace TelegramBot.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Update update)
         {
-            //Parse the update.Message.Text and call the appropriate service.
-           await _telegramBotService.GetUpdates(update);
+            try
+            {
+                await _telegramBotService.GetUpdates(update);
+            }
+            catch (Exception e)
+            {
+                //TODO: add logger.
+                return Ok();
+            }
 
             return Ok();
         }

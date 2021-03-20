@@ -1,38 +1,33 @@
-﻿using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InlineKeyboardButtons;
-using Telegram.Bot.Types.ReplyMarkups;
+using Telegram.Bot.Types.InputFiles;
 using TelegramBot.BLL.Interfaces;
-using TelegramBot.BLL.Models;
-using TelegramBot.BLL.Models.Contents;
 using TelegramBot.BLL.Models.Generics;
-using TelegramBot.DAL.EF;
-using TelegramBot.DAL.Entities;
-using TelegramBot.DAL.Enums;
-using System;
-using TelegramBot.BLL.Enums;
 using TelegramBot.BLL.Helpers;
+using TelegramBot.BLL.Helpers.Enums;
+using TelegramBot.DAL.Enums;
+using static TelegramBot.BLL.Helpers.MessageText;
 
 namespace TelegramBot.BLL.Services
 {
     public class TelegramBotService : ITelegramBotService
     {
         private readonly ITelegramBotClient _telegramBotClient;
-        private readonly ICommandService _commandService;
         private readonly IDbProblemsService _dbProblemsService;
-        private readonly ApplicationContext _context;
+        private readonly IDbSubmissionsService _dbSubmissionsService;
+        private readonly ILanguageService _languageService;
+        private readonly IMessageHandleService _messageHandleService;
 
-        public TelegramBotService(ITelegramBotClient telegramBotClient, ApplicationContext context, IDbProblemsService dbProblemsService)
+        public TelegramBotService(ITelegramBotClient telegramBotClient, IDbProblemsService dbProblemsService, IDbSubmissionsService dbSubmissionsService, ILanguageService languageService, IMessageHandleService messageHandleService)
         {
             _telegramBotClient = telegramBotClient;
-            _context = context;
             _dbProblemsService = dbProblemsService;
+            _dbSubmissionsService = dbSubmissionsService;
+            _languageService = languageService;
+            _messageHandleService = messageHandleService;
         }
 
         public async Task GetUpdates(Update update)
@@ -45,49 +40,40 @@ namespace TelegramBot.BLL.Services
                 _ => new Response()
             };
 
-            //var keyboard = new ReplyKeyboardMarkup
-                //{
-                //    Keyboard = new[]
-                //    {
-                //        new[]
-                //        {
-                //            new KeyboardButton("/Problems")
-                //        },
-                //        new[]
-                //        {
-                //            new KeyboardButton("/Submissions")
-                //        }
-                //    }
-                //};
-
-                switch (response.UpdateMessage)
-                {
-                    case null:
-                        return;
-                    case true:
-                        await _telegramBotClient.EditMessageReplyMarkupAsync(response.ChatId,
-                            response.UpdatingMessageId,
-                            response.InlineKeyboardMarkup);
-                        break;
-                    default:
-                        await _telegramBotClient.SendTextMessageAsync(response.ChatId, response.Message,
-                            replyToMessageId: response.ReplyToMessageId,
-                            replyMarkup: response.InlineKeyboardMarkup,
-                            disableWebPagePreview: true,
-                            parseMode: response.ParseMode);
-                        break;
-                }
+            switch (response.ResponseType)
+            {
+                case ResponseTypeEnum.Photo:
+                    await _telegramBotClient.SendPhotoAsync(
+                        response.ChatId,
+                        new InputOnlineFile(response.ImageStream, "Image.png"),
+                        response.Message);
+                    return;
+                case ResponseTypeEnum.UpdateMessage:
+                    await _telegramBotClient.EditMessageReplyMarkupAsync(response.ChatId,
+                        response.UpdatingMessageId,
+                        response.InlineKeyboardMarkup);
+                    break;
+                case ResponseTypeEnum.NewMessage:
+                    await _telegramBotClient.SendTextMessageAsync(response.ChatId, 
+                        response.Message,
+                        replyToMessageId: response.ReplyToMessageId,
+                        replyMarkup: response.InlineKeyboardMarkup ?? response.ReplyKeyboardMarkup,
+                        disableWebPagePreview: response.DisableWebPagePreview,
+                        parseMode: response.ParseMode);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private async Task<Response> HandleNewMessageAsync(Update update)
         {
-            //if user is first time logged in then //await _telegramBotClient.SendTextMessageAsync(message.Chat.Id, "Здравствуйте, Вас приветсвует Solveway bot", ParseMode.Html, false, false,0, keyboard);
-            // and authenticate him, create a json file and place data in it.
             return (update.Message.Text) switch
             {
-                "/Problems" => await _dbProblemsService.GetDbProblems(update),
-
-                _ => await _dbProblemsService.ComputeSolution(update)
+                Start => await _languageService.GetLanguagesAsync(update),
+                Problems => await _dbProblemsService.GetDbProblems(update),
+                Submissions => await _dbSubmissionsService.GetDbSubmissions(update),
+                _ => await _messageHandleService.Handle(update)
             };
         }
 
@@ -96,13 +82,20 @@ namespace TelegramBot.BLL.Services
             var command = update.CallbackQuery.Data.Split(' ');
             return (command[0]) switch
             {
-                nameof(PaginationEnums.One) => await _dbProblemsService.GetDbProblemsFirstPageAsync(update),
-                nameof(PaginationEnums.PrevPage) => await _dbProblemsService.GetDbProblemsPrevPageAsync(update, int.Parse(command[1])),
-                nameof(PaginationEnums.NextPage) => await _dbProblemsService.GetDbProblemsNextPageAsync(update, int.Parse(command[1]), int.Parse(command[2])),
-                nameof(PaginationEnums.LastPage) => await _dbProblemsService.GetDbProblemsLastPageAsync(update, int.Parse(command[1])),
+                nameof(PaginationEnum.DbProblemsOne) => await _dbProblemsService.GetDbProblemsFirstPageAsync(update),
+                nameof(PaginationEnum.DbProblemsPrevPage) => await _dbProblemsService.GetDbProblemsPrevPageAsync(update, int.Parse(command[1])),
+                nameof(PaginationEnum.DbProblemsNextPage) => await _dbProblemsService.GetDbProblemsNextPageAsync(update, int.Parse(command[1]), int.Parse(command[2])),
+                nameof(PaginationEnum.DbProblemsLastPage) => await _dbProblemsService.GetDbProblemsLastPageAsync(update, int.Parse(command[1])),
                 nameof(SectionEnums.DbProblems) => await _dbProblemsService.GetDbProblemByIdAsync(update, int.Parse(command[1])),
                 nameof(SectionEnums.DbProblemSolve) => await _dbProblemsService.PrepareSolveData(update, int.Parse(command[1])),
-                _ => new Response {UpdateMessage = null},
+                nameof(PaginationEnum.DbSubmissionsOne) => await _dbSubmissionsService.GetDbSubmissionsFirstPageAsync(update),
+                nameof(PaginationEnum.DbSubmissionsPrevPage) => await _dbSubmissionsService.GetDbSubmissionsPrevPageAsync(update, int.Parse(command[1])),
+                nameof(PaginationEnum.DbSubmissionsNextPage) => await _dbSubmissionsService.GetDbSubmissionsNextPageAsync(update, int.Parse(command[1]), int.Parse(command[2])),
+                nameof(PaginationEnum.DbSubmissionsLastPage) => await _dbSubmissionsService.GetDbSubmissionsLastPageAsync(update, int.Parse(command[1])),
+                nameof(SectionEnums.DbSubmissions) => await _dbSubmissionsService.GetDbSubmissionsByIdAsync(update, int.Parse(command[1])),
+                nameof(LanguagesEnum.En) => await _languageService.SetLanguage(update, LanguagesEnum.En),
+                nameof(LanguagesEnum.Ru) => await _languageService.SetLanguage(update, LanguagesEnum.Ru),
+                _ => new Response()
             };
         }
 

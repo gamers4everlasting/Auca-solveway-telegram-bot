@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "TelegramBot.ThirdPartyAPIs/1.0.0": {
+        "dependencies": {
+          "TelegramBot.Common": "1.0.0"
+        },
+        "runtime": {
+          "TelegramBot.ThirdPartyAPIs.dll": {}
+        }
+      },
+      "TelegramBot.Common/1.0.0": {
+        "runtime": {
+          "TelegramBot.Common.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "TelegramBot.ThirdPartyAPIs/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "TelegramBot.Common/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

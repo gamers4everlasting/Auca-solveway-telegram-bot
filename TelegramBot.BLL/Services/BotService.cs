@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Telegram.Bot;
+using TelegramBot.BLL.Interfaces;
 using TelegramBot.BLL.Models;
 
 namespace TelegramBot.BLL.Services

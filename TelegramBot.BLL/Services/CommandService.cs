@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TelegramBot.BLL.Interfaces;
 using TelegramBot.BLL.Models.Commands;
 
 namespace TelegramBot.BLL.Services

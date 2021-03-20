@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Telegram.Bot.Types;
 using TelegramBot.BLL.Models;
 using TelegramBot.BLL.Models.Generics;
+using TelegramBot.Dto.DbProblemModels;
+using TelegramBot.Dto.Helper;
 
 namespace TelegramBot.BLL.Interfaces
 {
@@ -18,6 +20,6 @@ namespace TelegramBot.BLL.Interfaces
         Task<Response> GetDbProblemsLastPageAsync(Update update, int lastPage);
         Task<Response> GetDbProblemByIdAsync(Update update, int problemId);
         Task<Response> PrepareSolveData(Update update, int problemId);
-        Task<Response> ComputeSolution(Update update);
+        Task<Response> ComputeSolutionAsync(Update update);
     }
 }

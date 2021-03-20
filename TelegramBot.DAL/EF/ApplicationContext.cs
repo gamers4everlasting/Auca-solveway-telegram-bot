@@ -12,8 +12,7 @@ namespace TelegramBot.DAL.EF
         {
         }
 
-        public DbSet<UserState> UsersStates { get; set; }
-        public DbSet<Сompany> Сompanies { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public ApplicationContext()
         {

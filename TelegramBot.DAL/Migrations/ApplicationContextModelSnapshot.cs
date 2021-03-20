@@ -19,7 +19,7 @@ namespace TelegramBot.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.0");
 
-            modelBuilder.Entity("TelegramBot.DAL.Entities.UserState", b =>
+            modelBuilder.Entity("TelegramBot.DAL.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -29,54 +29,34 @@ namespace TelegramBot.DAL.Migrations
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DeletedUtc")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                    b.Property<int?>("SolvewayUserId")
+                        .HasColumnType("int");
 
                     b.Property<int>("State")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedUtc")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("StudyBearer")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("StudyCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TelegramUserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
+                    b.HasIndex("SolvewayUserId")
+                        .IsUnique()
+                        .HasFilter("[SolvewayUserId] IS NOT NULL");
+
+                    b.HasIndex("TelegramUserId")
                         .IsUnique();
 
-                    b.ToTable("UsersStates");
-                });
-
-            modelBuilder.Entity("TelegramBot.DAL.Entities.Сompany", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .UseIdentityColumn();
-
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("DeletedUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("UpdatedUtc")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Сompanies");
+                    b.ToTable("Users");
                 });
 #pragma warning restore 612, 618
         }
