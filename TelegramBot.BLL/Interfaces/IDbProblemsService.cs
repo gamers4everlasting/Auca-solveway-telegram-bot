@@ -12,7 +12,7 @@ namespace TelegramBot.BLL.Interfaces
 {
     public interface IDbProblemsService
     {
-        Task<PagedModel<DbProblemsListBusinessModel>> GetDbProblemsAsync(int page);
+        Task<PagedModel<DbProblemsListBusinessModel>> GetDbProblemsAsync(int page, int telegramUserId);
         Task<Response> GetDbProblems(Update update);
         Task<Response> GetDbProblemsFirstPageAsync(Update update);
         Task<Response> GetDbProblemsPrevPageAsync(Update update, int currentPage);
@@ -21,5 +21,6 @@ namespace TelegramBot.BLL.Interfaces
         Task<Response> GetDbProblemByIdAsync(Update update, int problemId);
         Task<Response> PrepareSolveData(Update update, int problemId);
         Task<Response> ComputeSolutionAsync(Update update);
+        Task<Response> GetTableResultPictureAsync(Update update);
     }
 }

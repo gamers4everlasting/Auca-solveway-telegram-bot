@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using TelegramBot.Common.Helper;
-using TelegramBot.Dto.Helper;
 
-namespace TelegramBot.Dto.DbSubmissionModels
+namespace TelegramBot.Common.DbSubmissionModels
 {
     public class AllSubmissionsBusinessModel
     {

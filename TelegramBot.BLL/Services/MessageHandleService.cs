@@ -12,25 +12,22 @@ namespace TelegramBot.BLL.Services
     public class MessageHandleService: IMessageHandleService
     {
         private readonly ApplicationContext _context;
-        private readonly ISolvewayAuthorizationService _solvewayAuthService;
-        private readonly ILanguageService _languageService;
+        private readonly IUserService _userService;
         private readonly IDbProblemsService _dbProblemsService;
-        public MessageHandleService(ApplicationContext context, ISolvewayAuthorizationService solvewayAuthService, ILanguageService languageService, IDbProblemsService dbProblemsService)
+        public MessageHandleService(ApplicationContext context, IUserService userService, IDbProblemsService dbProblemsService)
         {
             _context = context;
-            _solvewayAuthService = solvewayAuthService;
-            _languageService = languageService;
+            _userService = userService;
             _dbProblemsService = dbProblemsService;
         }
         public async Task<Response> Handle(Update update)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.TelegramUserId == update.Message.From.Id);
-            if (user == null) throw new UnauthorizedAccessException(); //TODO: catch such exception and send "Please authorize to the system first";
+            if (user == null) throw new UnauthorizedAccessException();
 
             return user.State switch
             {
-                ClientStateEnum.SolvewayCodeSet => await _solvewayAuthService.ValidateSolvewayCodeAsync(update),
-                ClientStateEnum.LanguageSet => await _languageService.GetLanguagesAsync(update),
+                ClientStateEnum.SolvewayCodeSet => await _userService.ValidateSolvewayCodeAsync(update),
                 ClientStateEnum.ProblemSet => await _dbProblemsService.ComputeSolutionAsync(update),
                 ClientStateEnum.None => new Response {ResponseType = null},
                 _ => new Response {ResponseType = null}

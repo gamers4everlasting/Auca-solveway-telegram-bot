@@ -17,14 +17,12 @@ namespace TelegramBot.BLL.IocConfiguration
 
         public static IServiceCollection AddServiceDependencies(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<ICommandService, CommandService>();
             services.AddTransient<IBotService, BotService>();
             services.AddTransient<ITelegramBotService, TelegramBotService>();
             services.AddTransient<IDbProblemsService, DbProblemsService>();
             services.AddTransient<IDbSubmissionsService, DbSubmissionsService>();
-            services.AddTransient<ILanguageService, LanguageService>();
+            services.AddTransient<IUserService, UserService>();
             services.AddTransient<IMessageHandleService, MessageHandleService>();
-            services.AddTransient<ISolvewayAuthorizationService, SolvewayAuthorizationService>();
             services.AddTelegramBotClient(configuration);
             return services;
         }

@@ -1,6 +1,6 @@
 ﻿using System;
+using TelegramBot.Common.Helper.Enums;
 using TelegramBot.Dto.Helper;
-using TelegramBot.Dto.Helper.Enums;
 
 namespace TelegramBot.Dto.DbSubmissionModels
 {

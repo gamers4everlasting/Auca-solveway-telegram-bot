@@ -26,10 +26,13 @@ namespace TelegramBot.DAL.Migrations
                         .HasColumnType("int")
                         .UseIdentityColumn();
 
+                    b.Property<DateTime?>("BearerExpiresIn")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Language")
+                    b.Property<int>("ProblemId")
                         .HasColumnType("int");
 
                     b.Property<int?>("SolvewayUserId")

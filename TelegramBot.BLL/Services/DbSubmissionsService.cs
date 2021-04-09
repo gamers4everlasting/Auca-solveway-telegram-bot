@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -11,25 +12,34 @@ using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBot.BLL.Extensions;
 using TelegramBot.BLL.Helpers;
 using TelegramBot.BLL.Helpers.Enums;
+using TelegramBot.BLL.Helpers.Resources;
 using TelegramBot.BLL.Interfaces;
-using TelegramBot.BLL.Models;
 using TelegramBot.BLL.Models.Contents;
 using TelegramBot.BLL.Models.Generics;
 using TelegramBot.Common.DbSubmissionModels;
+using TelegramBot.Common.Extensions;
+using TelegramBot.DAL.EF;
 using TelegramBot.Dto.DbProblemModels;
 using TelegramBot.Dto.DbSubmissionModels;
-using TelegramBot.Dto.Extensions;
 using TelegramBot.Dto.Helper;
 
 namespace TelegramBot.BLL.Services
 {
-    public class DbSubmissionsService : BaseClient, IDbSubmissionsService
+    public class DbSubmissionsService : BaseAuth, IDbSubmissionsService
     {
-        public DbSubmissionsService(IHttpClientFactory clientFactory) : base(clientFactory)
+        public DbSubmissionsService(IHttpClientFactory clientFactory, ApplicationContext context) : base(clientFactory, context)
         {
         }
+
+
+        /// <summary>
+        /// Not a Callback.
+        /// </summary>
+        /// <param name="update"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbSubmissions(Update update)
         {
+            await AuthenticateAsync(update.Message.From.Id);
             var problemList = await GetDbSubmissionsAsync(1);
             var messageContent = PrepareSubmissionsListContent(problemList, 1);
             return new Response
@@ -43,40 +53,15 @@ namespace TelegramBot.BLL.Services
                 UpdatingMessageId = 0
             };
         }
-
         
-
-        public async Task<PagedModel<AllSubmissionsBusinessModel>> GetDbSubmissionsAsync(int page)
-        {
-            await AuthenticateAsync();
-
-            var model = new SubmissionsListBusinessModel
-            {
-                Send = false,
-                Correct = false,
-                Mistake = false,
-                FromDate = null,
-                ToDate = null,
-                UserId = null,
-                StudentId = new List<string>(),
-                GroupIdList = new List<int>(),
-                ProblemCode = null,
-                LanguageId = 2,
-                CollectionIdList = new List<int>(),
-                Page = page,
-                PageSize = ConstData.TotalItemsAmountForList
-            };
-
-
-            var response = await Client.PostAsJsonAsync("api/DbSubmissionsListApi/StudentSubmissionsList", model);
-
-            return await response.Content.ReadAsJsonPagedModelAsync<AllSubmissionsBusinessModel>();
-        }
-
-        
-
+        /// <summary>
+        /// Callback query
+        /// </summary>
+        /// <param name="update"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbSubmissionsFirstPageAsync(Update update)
         {
+            await AuthenticateAsync(update.CallbackQuery.From.Id);
             var problemList = await GetDbSubmissionsAsync(1);
             var messageContent = PrepareSubmissionsListContent(problemList, 1);
             return new Response
@@ -85,18 +70,24 @@ namespace TelegramBot.BLL.Services
                 Message = messageContent.ResponseText,
                 ChatId = update.CallbackQuery.Message.Chat.Id,
                 ParseMode = ParseMode.Default,
-                ReplyToMessageId = 0,
                 ResponseType = ResponseTypeEnum.UpdateMessage,
                 UpdatingMessageId = update.CallbackQuery.Message.MessageId
             };
         }
 
+        /// <summary>
+        /// Callback query
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="currentPage"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbSubmissionsPrevPageAsync(Update update, int currentPage)
         {
             if (currentPage == 1)
             {
                 return new Response{ResponseType = null};
             }
+            await AuthenticateAsync(update.CallbackQuery.From.Id);
             var problemList = await GetDbSubmissionsAsync(currentPage - 1);
             var messageContent = PrepareSubmissionsListContent(problemList, currentPage);
             return new Response
@@ -105,12 +96,18 @@ namespace TelegramBot.BLL.Services
                 Message = messageContent.ResponseText,
                 ChatId = update.CallbackQuery.Message.Chat.Id,
                 ParseMode = ParseMode.Default,
-                ReplyToMessageId = 0,
                 ResponseType = ResponseTypeEnum.UpdateMessage,
                 UpdatingMessageId = update.CallbackQuery.Message.MessageId
             };
         }
 
+        /// <summary>
+        /// Callback query
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="currentPage"></param>
+        /// <param name="maxPage"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbSubmissionsNextPageAsync(Update update, int currentPage, int maxPage)
         {
             if (currentPage == maxPage)
@@ -118,6 +115,7 @@ namespace TelegramBot.BLL.Services
                 return new Response{ResponseType = null};
             }
 
+            await AuthenticateAsync(update.CallbackQuery.From.Id);
             var problemList = await GetDbSubmissionsAsync(currentPage + 1);
             var messageContent = PrepareSubmissionsListContent(problemList, currentPage + 1);
             return new Response
@@ -126,14 +124,20 @@ namespace TelegramBot.BLL.Services
                 Message = messageContent.ResponseText,
                 ChatId = update.CallbackQuery.Message.Chat.Id,
                 ParseMode = ParseMode.Default,
-                ReplyToMessageId = 0,
                 ResponseType = ResponseTypeEnum.UpdateMessage,
                 UpdatingMessageId = update.CallbackQuery.Message.MessageId
             };
         }
 
+        /// <summary>
+        /// Callback query
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="lastPage"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbSubmissionsLastPageAsync(Update update, int lastPage)
         {
+            await AuthenticateAsync(update.CallbackQuery.From.Id);
             var problemList = await GetDbSubmissionsAsync(lastPage);
             var messageContent = PrepareSubmissionsListContent(problemList, lastPage);
             return new Response
@@ -148,28 +152,57 @@ namespace TelegramBot.BLL.Services
             };
         }
 
+        /// <summary>
+        /// from Callback, Gets submission by Id
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="submissionId"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbSubmissionsByIdAsync(Update update, int submissionId)
         {
-            await AuthenticateAsync();
+            await AuthenticateAsync(update.CallbackQuery.From.Id);
 
             var submissionResponse = await Client.GetAsync($"/api/DbSubmissionsApi/GetSubmission?id={submissionId}&role=Student");
             var submissionData = await submissionResponse.Content.ReadAsJsonAsync<DbSubmissionByIdBusinessModel>();
 
-            var problemResponse = await Client.GetAsync($"api/DbProblemApi/GetById?problemId={submissionData.ProblemId}&languageId=1");
+            var problemResponse = await Client.GetAsync($"api/DbProblemApi/GetById?problemId={submissionData.ProblemId}&languageId={CultureInfo.CurrentCulture.GetCurrentCultureId()}");
             var problemData = await problemResponse.Content.ReadAsJsonAsync<DbProblemBusinessModel>();
 
-            //create a view for one submission data
             var content = PrepareSingleSubmissionContent(submissionData, problemData);
+            //toDo: maybe add a diagram too?
             return new Response
             {
                 InlineKeyboardMarkup = content.InlineKeyboardMarkup,
                 Message = content.ResponseText,
                 ChatId = update.CallbackQuery.Message.Chat.Id,
                 ParseMode = ParseMode.Default,
-                ReplyToMessageId = 0,
                 ResponseType = ResponseTypeEnum.NewMessage,
-                UpdatingMessageId = 0
             };
+        }
+
+        private async Task<PagedModel<AllSubmissionsBusinessModel>> GetDbSubmissionsAsync(int page)
+        {
+            var model = new SubmissionsListBusinessModel
+            {
+                Send = false,
+                Correct = false,
+                Mistake = false,
+                FromDate = null,
+                ToDate = null,
+                UserId = null,
+                StudentId = new List<string>(),
+                GroupIdList = new List<int>(),
+                ProblemCode = null,
+                LanguageId = CultureInfo.CurrentCulture.GetCurrentCultureId(),
+                CollectionIdList = new List<int>(),
+                Page = page,
+                PageSize = ConstData.TotalItemsAmountForList
+            };
+
+
+            var response = await Client.PostAsJsonAsync("api/DbSubmissionsListApi/StudentSubmissionsList", model);
+
+            return await response.Content.ReadAsJsonPagedModelAsync<AllSubmissionsBusinessModel>();
         }
 
         private PreparedMessageContent PrepareSubmissionsListContent(PagedModel<AllSubmissionsBusinessModel> submissionsList, int currentPage)
@@ -179,9 +212,9 @@ namespace TelegramBot.BLL.Services
             var sb = new StringBuilder();
             var buttons = new InlineKeyboardButton[submissions.Count + 1][];//+1 for pagination
 
-            sb.AppendLine("Submissions");
-            sb.AppendLine("[Solved] [Code]-[Name]");
-            sb.AppendLine("___________________________________________");
+            sb.AppendLine(Resources.YourSubmissions);
+            sb.AppendLine(Resources.SubmissionListDescription);
+            sb.AppendLine();
             for (var i = 0; i < submissions.Count; i++)
             {
                 var submission = submissions[i];
@@ -218,18 +251,18 @@ namespace TelegramBot.BLL.Services
             var sb = new StringBuilder();
             var buttons = new InlineKeyboardButton[1][];
             sb.AppendLine($"{problemData.ProblemCode} | {problemData.ProblemName} ");
-            sb.AppendLine("-----------Problem description------------");
+            sb.AppendLine($"---------{Resources.TasksDescription}----------");
             sb.AppendLine($"{problemData.ProblemText}");
-            sb.AppendLine("-------------Solution---------------------");
+            sb.AppendLine($"-------------{Resources.YourSolution}--------------");
             sb.AppendLine($"{submission.Solution}");
-            sb.AppendLine("-------------LogText----------------------");
+            sb.AppendLine($"-------------------{Resources.LogText}----------------");
             sb.AppendLine($"{submission.LogText}");
-            sb.AppendLine("-------------Info-------------------------");
+            sb.AppendLine($"-------------{Resources.GeneralInfo}-------------");
             sb.AppendLine($"Server: {submission.JudgeType} | {problemData.SubjectName}");
             sb.AppendLine();
             buttons[0] = new InlineKeyboardButton[2];
-            buttons[0][0] = InlineKeyboardButton.WithCallbackData("Resolve Problem", $"{SectionEnums.DbProblemSolve} {submission.ProblemId}");
-            buttons[0][1] = InlineKeyboardButton.WithCallbackData("Correct Result", $"{SectionEnums.DbProblemCorrectResult} {submission.ProblemId}");
+            buttons[0][0] = InlineKeyboardButton.WithCallbackData(Resources.SolveAgainButton, $"{SectionEnums.DbProblemSolve} {submission.ProblemId}");
+            buttons[0][1] = InlineKeyboardButton.WithCallbackData(Resources.ShowCorrectResultButton, $"{SectionEnums.DbProblemCorrectResult} {submission.ProblemId}");
             return new PreparedMessageContent
             {
                 ResponseText = sb.ToString(),

@@ -4,7 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TelegramBot.Dto.Helper;
 
-namespace TelegramBot.Dto.Extensions
+namespace TelegramBot.Common.Extensions
 {
     public static class HttpClientExtensions
     {

@@ -5,17 +5,17 @@ namespace TelegramBot.BLL.Helpers
 {
     public static class KeyboardMarkupData
     {
-        public static IReplyMarkup GeneralProblemsAndSubmissions = new ReplyKeyboardMarkup
+        public static readonly IReplyMarkup GeneralProblemsAndSubmissions = new ReplyKeyboardMarkup
         {
             Keyboard = new[]
             {
                 new[]
                 {
-                    new KeyboardButton("/Problems")
+                    new KeyboardButton(MessageTextTypes.Problems)
                 },
                 new[]
                 {
-                    new KeyboardButton("/Submissions")
+                    new KeyboardButton(MessageTextTypes.Submissions)
                 }
             }
         };

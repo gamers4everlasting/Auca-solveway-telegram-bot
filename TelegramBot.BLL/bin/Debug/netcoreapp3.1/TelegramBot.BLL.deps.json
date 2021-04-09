@@ -21,6 +21,11 @@
         },
         "runtime": {
           "TelegramBot.BLL.dll": {}
+        },
+        "resources": {
+          "ru/TelegramBot.BLL.resources.dll": {
+            "locale": "ru"
+          }
         }
       },
       "EntityFrameworkCore.CommonTools/2.0.2": {

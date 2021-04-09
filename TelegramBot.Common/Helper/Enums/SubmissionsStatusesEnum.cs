@@ -1,4 +1,6 @@
-﻿namespace TelegramBot.Dto.Helper.Enums
+﻿using TelegramBot.Dto.Helper;
+
+namespace TelegramBot.Common.Helper.Enums
 {
     public enum SubmissionsStatusesEnum
     {

@@ -166,3 +166,5 @@ C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\obj\Debug\netcoreapp3.1\Tel
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.dll
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.pdb
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\obj\Debug\netcoreapp3.1\TelegramBot.genruntimeconfig.cache
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\bin\Debug\netcoreapp3.1\Helpers\Resources\Resources.resx
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\bin\Debug\netcoreapp3.1\ru\TelegramBot.BLL.resources.dll

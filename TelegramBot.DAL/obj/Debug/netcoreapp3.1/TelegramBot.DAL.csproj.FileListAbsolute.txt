@@ -14,10 +14,10 @@ C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\bin\Debug\netcoreapp3.1
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\bin\Debug\netcoreapp3.1\TelegramBot.DAL.runtimeconfig.dev.json
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\bin\Debug\netcoreapp3.1\TelegramBot.DAL.dll
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\bin\Debug\netcoreapp3.1\TelegramBot.DAL.pdb
-C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\obj\Debug\netcoreapp3.1\TelegramBot.DAL.csprojAssemblyReference.cache
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\obj\Debug\netcoreapp3.1\TelegramBot.DAL.AssemblyInfoInputs.cache
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\obj\Debug\netcoreapp3.1\TelegramBot.DAL.AssemblyInfo.cs
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\obj\Debug\netcoreapp3.1\TelegramBot.DAL.csproj.CoreCompileInputs.cache
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\obj\Debug\netcoreapp3.1\TelegramBot.DAL.dll
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\obj\Debug\netcoreapp3.1\TelegramBot.DAL.pdb
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\obj\Debug\netcoreapp3.1\TelegramBot.DAL.genruntimeconfig.cache
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.DAL\obj\Debug\netcoreapp3.1\TelegramBot.DAL.csprojAssemblyReference.cache

@@ -4,12 +4,12 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
-using TelegramBot.BLL.Interfaces;
-using TelegramBot.BLL.Models.Generics;
 using TelegramBot.BLL.Helpers;
 using TelegramBot.BLL.Helpers.Enums;
-using TelegramBot.DAL.Enums;
-using static TelegramBot.BLL.Helpers.MessageText;
+using TelegramBot.BLL.Helpers.Resources;
+using TelegramBot.BLL.Interfaces;
+using TelegramBot.BLL.Models.Generics;
+using static TelegramBot.BLL.Helpers.MessageTextTypes;
 
 namespace TelegramBot.BLL.Services
 {
@@ -18,59 +18,82 @@ namespace TelegramBot.BLL.Services
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IDbProblemsService _dbProblemsService;
         private readonly IDbSubmissionsService _dbSubmissionsService;
-        private readonly ILanguageService _languageService;
+        private readonly IUserService _userService;
         private readonly IMessageHandleService _messageHandleService;
 
-        public TelegramBotService(ITelegramBotClient telegramBotClient, IDbProblemsService dbProblemsService, IDbSubmissionsService dbSubmissionsService, ILanguageService languageService, IMessageHandleService messageHandleService)
+        public TelegramBotService(ITelegramBotClient telegramBotClient, IDbProblemsService dbProblemsService, IDbSubmissionsService dbSubmissionsService, IUserService userService, IMessageHandleService messageHandleService)
         {
             _telegramBotClient = telegramBotClient;
             _dbProblemsService = dbProblemsService;
             _dbSubmissionsService = dbSubmissionsService;
-            _languageService = languageService;
+            _userService = userService;
             _messageHandleService = messageHandleService;
         }
 
         public async Task GetUpdates(Update update)
         {
             if (update == null) return;
-            var response = update.Type switch
+            try
             {
-                UpdateType.CallbackQueryUpdate => await HandleNewCallbackQueryAsync(update),
-                UpdateType.MessageUpdate => await HandleNewMessageAsync(update),
-                _ => new Response()
-            };
+                var response = update.Type switch
+                {
+                    UpdateType.CallbackQueryUpdate => await HandleNewCallbackQueryAsync(update),
+                    UpdateType.MessageUpdate => await HandleNewMessageAsync(update),
+                    _ => new Response()
+                };
 
-            switch (response.ResponseType)
-            {
-                case ResponseTypeEnum.Photo:
-                    await _telegramBotClient.SendPhotoAsync(
-                        response.ChatId,
-                        new InputOnlineFile(response.ImageStream, "Image.png"),
-                        response.Message);
-                    return;
-                case ResponseTypeEnum.UpdateMessage:
-                    await _telegramBotClient.EditMessageReplyMarkupAsync(response.ChatId,
-                        response.UpdatingMessageId,
-                        response.InlineKeyboardMarkup);
-                    break;
-                case ResponseTypeEnum.NewMessage:
-                    await _telegramBotClient.SendTextMessageAsync(response.ChatId, 
-                        response.Message,
-                        replyToMessageId: response.ReplyToMessageId,
-                        replyMarkup: response.InlineKeyboardMarkup ?? response.ReplyKeyboardMarkup,
-                        disableWebPagePreview: response.DisableWebPagePreview,
-                        parseMode: response.ParseMode);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                switch (response.ResponseType)
+                {
+                    case ResponseTypeEnum.Photo:
+                        await _telegramBotClient.SendPhotoAsync(
+                            response.ChatId,
+                            new InputOnlineFile(response.ImageStream, "Image.png"));
+                        return;
+                    case ResponseTypeEnum.UpdateMessage:
+                        await _telegramBotClient.EditMessageReplyMarkupAsync(response.ChatId,
+                            response.UpdatingMessageId,
+                            response.InlineKeyboardMarkup);
+                        return;
+                    case ResponseTypeEnum.NewMessage:
+                        await _telegramBotClient.SendTextMessageAsync(response.ChatId,
+                            response.Message,
+                            replyToMessageId: response.ReplyToMessageId,
+                            replyMarkup: response.InlineKeyboardMarkup ?? response.ReplyKeyboardMarkup,
+                            disableWebPagePreview: response.DisableWebPagePreview,
+                            parseMode: response.ParseMode);
+                        return;
+                    case null:
+                        throw new Exception("Nothing changed");
+                    default:
+                        throw new Exception("Nothing changed");
+                }
             }
+            catch (UnauthorizedAccessException)
+            {
+                if (update.CallbackQuery == null)
+                {
+                    await _telegramBotClient.SendTextMessageAsync(
+                        update.Message.Chat.Id,
+                        ErrorResources.AuthorizationError
+                    );
+                }
+                else //in case if user pushed a callback button.
+                {
+                    await _telegramBotClient.SendTextMessageAsync(
+                        update.CallbackQuery.Message.Chat.Id,
+                        ErrorResources.AuthorizationError
+                    );
+                }
+            }
+
+            
         }
 
         private async Task<Response> HandleNewMessageAsync(Update update)
         {
             return (update.Message.Text) switch
             {
-                Start => await _languageService.GetLanguagesAsync(update),
+                Start => await _userService.CreateUser(update),
                 Problems => await _dbProblemsService.GetDbProblems(update),
                 Submissions => await _dbSubmissionsService.GetDbSubmissions(update),
                 _ => await _messageHandleService.Handle(update)
@@ -93,8 +116,7 @@ namespace TelegramBot.BLL.Services
                 nameof(PaginationEnum.DbSubmissionsNextPage) => await _dbSubmissionsService.GetDbSubmissionsNextPageAsync(update, int.Parse(command[1]), int.Parse(command[2])),
                 nameof(PaginationEnum.DbSubmissionsLastPage) => await _dbSubmissionsService.GetDbSubmissionsLastPageAsync(update, int.Parse(command[1])),
                 nameof(SectionEnums.DbSubmissions) => await _dbSubmissionsService.GetDbSubmissionsByIdAsync(update, int.Parse(command[1])),
-                nameof(LanguagesEnum.En) => await _languageService.SetLanguage(update, LanguagesEnum.En),
-                nameof(LanguagesEnum.Ru) => await _languageService.SetLanguage(update, LanguagesEnum.Ru),
+                nameof(SectionEnums.TableResult) => await _dbProblemsService.GetTableResultPictureAsync(update),
                 _ => new Response()
             };
         }

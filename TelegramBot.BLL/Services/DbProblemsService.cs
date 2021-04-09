@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+using Polly;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineKeyboardButtons;
@@ -16,37 +15,35 @@ using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBot.BLL.Extensions;
 using TelegramBot.BLL.Helpers;
 using TelegramBot.BLL.Helpers.Enums;
+using TelegramBot.BLL.Helpers.Resources;
 using TelegramBot.BLL.Interfaces;
 using TelegramBot.BLL.Models;
 using TelegramBot.BLL.Models.Contents;
 using TelegramBot.BLL.Models.Generics;
+using TelegramBot.Common.Extensions;
 using TelegramBot.Common.Helper;
 using TelegramBot.Common.Models;
 using TelegramBot.DAL.EF;
 using TelegramBot.DAL.Enums;
 using TelegramBot.Dto.DbProblemModels;
 using TelegramBot.Dto.DbSubmissionModels;
-using TelegramBot.Dto.Extensions;
 using TelegramBot.Dto.Helper;
-using File = Telegram.Bot.Types.File;
 
 namespace TelegramBot.BLL.Services
 {
-    public class DbProblemsService: BaseClient, IDbProblemsService
+    public class DbProblemsService: BaseAuth, IDbProblemsService
     {
-        private readonly ApplicationContext _context;
-        public DbProblemsService(ApplicationContext context, IHttpClientFactory clientFactory) : base(clientFactory)
+        public DbProblemsService(ApplicationContext context, IHttpClientFactory clientFactory) : base(clientFactory, context)
         {
-            _context = context;
         }
 
-        public async Task<PagedModel<DbProblemsListBusinessModel>> GetDbProblemsAsync(int page)
+        public async Task<PagedModel<DbProblemsListBusinessModel>> GetDbProblemsAsync(int page, int telegramUserId)
         {
-            await AuthenticateAsync();
+            await AuthenticateAsync(telegramUserId);
 
             var model = new SortProblemBusinessModel
             {
-                LanguageId = 1,
+                LanguageId = CultureInfo.CurrentCulture.GetCurrentCultureId(),
                 Page = page,
                 PageSize = ConstData.TotalItemsAmountForList,
                 subjectIds = new List<int>(),
@@ -58,7 +55,7 @@ namespace TelegramBot.BLL.Services
                 NotSolved = false,
                 Role = "Student",
                 UserId = null,
-                Sorting = new SortingModel() { Direction = "desc", Field = "Date" }
+                Sorting = new SortingModel() { Direction = "asc", Field = "Date" }
             };
             
             var response = await Client.PostAsJsonAsync("/api/DbProblemApi/SortDbProblems", model);
@@ -68,7 +65,7 @@ namespace TelegramBot.BLL.Services
 
         public async Task<Response> GetDbProblems(Update update)
         {
-            var problemList = await GetDbProblemsAsync(1);
+            var problemList = await GetDbProblemsAsync(1, update.Message.From.Id);
             var messageContent = PrepareProblemListContent(problemList, 1);
             return new Response
             {
@@ -83,7 +80,7 @@ namespace TelegramBot.BLL.Services
         }
         public async Task<Response> GetDbProblemsFirstPageAsync(Update update)
         {
-            var problemList = await GetDbProblemsAsync(1);
+            var problemList = await GetDbProblemsAsync(1, update.CallbackQuery.From.Id);
             var messageContent = PrepareProblemListContent(problemList, 1);
             return new Response
             {
@@ -97,13 +94,19 @@ namespace TelegramBot.BLL.Services
             };
         }
 
+        /// <summary>
+        /// Callback query gets data for previous page.
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="currentPage"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbProblemsPrevPageAsync(Update update, int currentPage)
         {
             if (currentPage == 1)
             {
                 return new Response{ResponseType = null};
             }
-            var problemList = await GetDbProblemsAsync(currentPage - 1);
+            var problemList = await GetDbProblemsAsync(currentPage - 1, update.CallbackQuery.From.Id);
             var messageContent = PrepareProblemListContent(problemList, currentPage);
             return new Response
             {
@@ -117,6 +120,13 @@ namespace TelegramBot.BLL.Services
             };
         }
 
+        /// <summary>
+        /// Callback query, gets next problem page
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="currentPage"></param>
+        /// <param name="maxPage"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbProblemsNextPageAsync(Update update, int currentPage, int maxPage)
         {
             if (currentPage == maxPage)
@@ -124,7 +134,7 @@ namespace TelegramBot.BLL.Services
                 return new Response();
             }
 
-            var problemList = await GetDbProblemsAsync(currentPage + 1);
+            var problemList = await GetDbProblemsAsync(currentPage + 1, update.CallbackQuery.From.Id);
             var messageContent = PrepareProblemListContent(problemList, currentPage+1);
             return new Response
             {
@@ -138,9 +148,15 @@ namespace TelegramBot.BLL.Services
             };
         }
 
+        /// <summary>
+        /// Callback query, gets last data page
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="lastPage"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbProblemsLastPageAsync(Update update, int lastPage)
         {
-            var problemList = await GetDbProblemsAsync(lastPage);
+            var problemList = await GetDbProblemsAsync(lastPage, update.CallbackQuery.From.Id);
             var messageContent = PrepareProblemListContent(problemList, lastPage);
             return new Response
             {
@@ -154,19 +170,22 @@ namespace TelegramBot.BLL.Services
             };
         }
 
+        /// <summary>
+        /// Callback query, gets Problem by Id
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="problemId"></param>
+        /// <returns></returns>
         public async Task<Response> GetDbProblemByIdAsync(Update update, int problemId)
         {
-            await AuthenticateAsync();
+            await AuthenticateAsync(update.CallbackQuery.From.Id);
             
-            var response = await Client.GetAsync($"/api/DbProblemApi/GetById?problemId={problemId}&languageId=1");
+            var response = await Client.GetAsync($"/api/DbProblemApi/GetById?problemId={problemId}&languageId={CultureInfo.CurrentCulture.GetCurrentCultureId()}");
             
             var problemData =  await response.Content.ReadAsJsonAsync<DbProblemBusinessModel>();
             var content = PrepareSingleProblemContent(problemData);
             var diagramLink = await GetDiagramLink(problemData.SubjectId);
-            //var imgStream =
-            //    DbImageGenerator.GenerateStream(
-            //        "Hello my friend\n _____________________\n\t|Data1| Data2| Data3|\n |Data4|Data5|Data6| \n Local");
-
+            
             return new Response
             {
                 InlineKeyboardMarkup = content.InlineKeyboardMarkup, 
@@ -179,11 +198,11 @@ namespace TelegramBot.BLL.Services
                 DisableWebPagePreview = false
             };
         }
-
+        
         private async Task<string> GetDiagramLink(int subjectId)
         {
             var response = await 
-                Client.GetAsync($"api/DbProblemApi/GetDiagramsAndDatabases?subjectId={subjectId}&languageId=2");
+                Client.GetAsync($"api/DbProblemApi/GetDiagramsAndDatabases?subjectId={subjectId}&languageId={CultureInfo.CurrentCulture.GetCurrentCultureId()}");
             if (!response.IsSuccessStatusCode) return string.Empty;
             var model = await response.Content.ReadAsJsonAsync<DiagramAndDatabaseForProblemBusinessModel>();
             var link = model.Diagrams.Select(x => x.Location).FirstOrDefault();
@@ -191,57 +210,79 @@ namespace TelegramBot.BLL.Services
             return $"[ ](https://test.solveway.club{link})";
         }
 
+        /// <summary>
+        /// Not a callback
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="problemId"></param>
+        /// <returns></returns>
         public async Task<Response> PrepareSolveData(Update update, int problemId)
         {
-            var user = await _context.Users.FirstAsync(x => x.TelegramUserId == update.CallbackQuery.From.Id);
+            var user = await Context.Users.FirstAsync(x => x.TelegramUserId == update.CallbackQuery.From.Id);
             user.State = ClientStateEnum.ProblemSet;
             user.ProblemId = problemId;
-            await _context.SaveChangesAsync();
-            
+            await Context.SaveChangesAsync();
             return new Response
             {
-                Message = user.Language == LanguagesEnum.En ? "your solution: ": "ваше решение: ", //ToDo: Localization
+                Message = Resources.EnterSolution,
                 ChatId = update.CallbackQuery.Message.Chat.Id,
                 ParseMode = ParseMode.Default,
-                ReplyToMessageId = 0,
-                ResponseType = ResponseTypeEnum.UpdateMessage,
-                UpdatingMessageId = 0
+                ResponseType = ResponseTypeEnum.NewMessage,
             };
         }
 
+        /// <summary>
+        /// Not a callback, computes problem submission
+        /// </summary>
+        /// <param name="update"></param>
+        /// <returns></returns>
         public async Task<Response> ComputeSolutionAsync(Update update)
         {
-            var user = await _context.Users.FirstAsync(x => x.TelegramUserId == update.Message.From.Id);
+            var user = await Context.Users.FirstAsync(x => x.TelegramUserId == update.Message.From.Id);
             
             var model = new DbSubmissionsBusinessModel
             {
                 ProblemId = user.ProblemId,
                 SubmittedQuery = update.Message.Text,
                 JudgeTypeId = 1,
-                LanguageId = 1
+                LanguageId = CultureInfo.CurrentCulture.GetCurrentCultureId()
             };
 
-            await AuthenticateAsync();
-            var response = await Client.PostAsJsonAsync("/api/DbCheckSolution/Create", model);
+            await AuthenticateAsync(update.Message.From.Id);
+            var response = await Client.PostAsJsonAsync(SolvewayApiEndponts.DbCheckSolution, model);
 
             var responseData = await response.Content.ReadAsJsonAsync<DbValidationResult>();
-            
+
+
+            var imgStream = DbImageGenerator.GenerateStream(responseData);
             var preparedResponse = PrepareSubmissionStatus(responseData, user.ProblemId);
             
 
-            //set problemId to 0
+            //update users state in db.
             user.State = ClientStateEnum.None;
             user.ProblemId = 0;
-            await _context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
             
             return new Response
             {
                 Message = preparedResponse.ResponseText,
                 ChatId = update.Message.Chat.Id,
-                ParseMode = ParseMode.Default,
-                ReplyToMessageId = 0,
                 ResponseType = ResponseTypeEnum.NewMessage,
-                InlineKeyboardMarkup = preparedResponse.InlineKeyboardMarkup
+                InlineKeyboardMarkup = preparedResponse.InlineKeyboardMarkup,
+                ParseMode = ParseMode.Markdown
+            };
+        }
+
+
+        public async Task<Response> GetTableResultPictureAsync(Update update)
+        {
+            var user = await Context.Users.FirstAsync(x => x.TelegramUserId == update.CallbackQuery.From.Id);
+            var fs = System.IO.File.OpenRead(@"C:\Users\OlenPC\Desktop\Auca\TelegramBot\test.png");
+            return new Response
+            {
+                ResponseType = ResponseTypeEnum.Photo,
+                ChatId = update.CallbackQuery.Message.Chat.Id,
+                ImageStream = fs
             };
         }
 
@@ -250,8 +291,7 @@ namespace TelegramBot.BLL.Services
             var sb = new StringBuilder();
             if (responseData.Result)
             {
-                sb.AppendLine("Query is correct");
-                
+                sb.AppendLine(Resources.QueryCorrect);
             }
             else
             {
@@ -260,7 +300,7 @@ namespace TelegramBot.BLL.Services
                     if (responseData.Description.Contains("SUBMIS0004ER"))
                     {
                         var parsed = responseData.Description[0].Split(',');
-                        sb.AppendLine($"The number of rows returned is different on database №-{i + 1}. quantity: {parsed[1]}. expected: {parsed[2]}");
+                        sb.AppendLine($"The number of rows returned is different on database №-{i + 1}. quantity: {parsed[1]}. expected: {parsed[2]}"); //TODO: Ask Ermek
                     }
                     else
                     {
@@ -270,8 +310,9 @@ namespace TelegramBot.BLL.Services
             }
 
             var buttons = new InlineKeyboardButton[1][];
-            buttons[0] = new InlineKeyboardButton[1];
-            buttons[0][0] = InlineKeyboardButton.WithCallbackData("solve again", $"{SectionEnums.DbProblemSolve} {problemId}");//TODo: Localization
+            buttons[0] = new InlineKeyboardButton[2];
+            buttons[0][0] = InlineKeyboardButton.WithCallbackData(Resources.TableResultButton, $"{SectionEnums.TableResult}");
+            buttons[0][1] = InlineKeyboardButton.WithCallbackData(Resources.SolveAgainButton, $"{SectionEnums.DbProblemSolve} {problemId}");
             return new PreparedMessageContent
             {
                 ResponseText = sb.ToString(),
@@ -282,16 +323,14 @@ namespace TelegramBot.BLL.Services
         private PreparedMessageContent PrepareSingleProblemContent(DbProblemBusinessModel problem)//TODo Localization
         {
             var sb = new StringBuilder();
-            var buttons = new InlineKeyboardButton[2][];
+            var buttons = new InlineKeyboardButton[1][];
             sb.AppendLine($"{problem.ProblemCode} | {problem.ProblemName}");
-            sb.AppendLine("------------------------------------------");
+            sb.AppendLine();
             sb.AppendLine($"{problem.ProblemText}");
             sb.AppendLine();
             buttons[0] = new InlineKeyboardButton[2];
-            buttons[0][0] = InlineKeyboardButton.WithCallbackData("Diagram", $"{SectionEnums.DbProblemDiagram} {problem.SubjectId}");
-            buttons[0][1] = InlineKeyboardButton.WithCallbackData("Correct Result", $"{SectionEnums.DbProblemCorrectResult} {problem.Id}");
-            buttons[1] = new InlineKeyboardButton[1];
-            buttons[1][0] = InlineKeyboardButton.WithCallbackData("Solve Problem", $"{SectionEnums.DbProblemSolve} {problem.Id}");
+            buttons[0][0] = InlineKeyboardButton.WithCallbackData(Resources.ShowCorrectResultButton, $"{SectionEnums.DbProblemCorrectResult} {problem.Id}");
+            buttons[0][1] = InlineKeyboardButton.WithCallbackData(Resources.SolveProblemButton, $"{SectionEnums.DbProblemSolve} {problem.Id}");
             return new PreparedMessageContent
             {
                 ResponseText = sb.ToString(),
@@ -305,9 +344,9 @@ namespace TelegramBot.BLL.Services
             var sb = new StringBuilder();
             var buttons = new InlineKeyboardButton[problems.Count + 1][];//+1 for pagination
 
-            sb.AppendLine("List of Tasks");
-            sb.AppendLine("[Solved] [Code] [Level] [SubjectArea]-[Name]");
-            sb.AppendLine("___________________________________________");
+            sb.AppendLine(Resources.Tasks);
+            sb.AppendLine(Resources.ListOfTasksDescription);
+            sb.AppendLine();
             for (var i = 0; i < problems.Count; i++)
             {
                 var problem = problems[i];

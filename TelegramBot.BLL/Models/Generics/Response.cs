@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Telegram.Bot.Types;
+﻿using System.IO;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using TelegramBot.BLL.Helpers.Enums;
@@ -26,6 +22,7 @@ namespace TelegramBot.BLL.Models.Generics
         {
             ImageStream = null;
             ResponseType = null;
+            ReplyToMessageId = 0;
         }
         
     }
