@@ -10,8 +10,7 @@ namespace TelegramBot.BLL.Services
 {
     public static class DbImageGenerator
     {
-
-        public static MemoryStream GenerateStream(DbValidationResult validationData)
+        public static void GenerateStream(DbValidationResult validationData)
         {
             var text = new StringBuilder();
             var correctTable = validationData.SolutionResult;
@@ -24,17 +23,17 @@ namespace TelegramBot.BLL.Services
 
             var maxUserDataLength = GetMaxRowsDataLength(userRows); //find max length of column data.
             var maxCorrectDataLength = GetMaxRowsDataLength(correctRows); //find max length of column data.
+            const int spaceBetweenColumn = 5;
             while (i < userRows.Length || j < correctRows.Length)
             {
                 var rowData = new StringBuilder();
                 if (i < userRows.Length)
                 {
-                    foreach (var t in userRows[i].Cells)
+                    var userRowCells = userRows[i].Cells;
+                    for (var cell = 0; cell < userRowCells.Length; cell++)
                     {
-                        var spacesToAdd = maxUserDataLength[i] - t.Value.Length + 2;
-                        rowData.Append(t.Value + GenerateWhiteSpaces(spacesToAdd));
-                        //rowData.Append($"{t.Value,-40}");
-                        //if (!userRows[i].IsHeader) rowData += "|" + (cell.IsValid ? "❌" : "✅") + "\t";
+                        var spacesToAdd = maxUserDataLength[cell] - userRowCells[cell].Value.Length + spaceBetweenColumn;
+                        rowData.Append(userRowCells[cell].Value + GenerateWhiteSpaces(spacesToAdd));
                     }
 
                     i++;
@@ -42,12 +41,18 @@ namespace TelegramBot.BLL.Services
                 
                 if (j < correctRows.Length)
                 {
-                    rowData.Append(GenerateWhiteSpaces(4)); //отступы до второй таблицы
-                    foreach (var t in correctRows[j].Cells)
+                    if (i == userRows.Length)
                     {
-                        var spacesToAdd = maxCorrectDataLength[j] - t.Value.Length + 2;
-                        rowData.Append(t.Value + GenerateWhiteSpaces(spacesToAdd));
-                        //rowData.Append($"{t.Value,-40}");
+                        var spacesToAdd = maxUserDataLength.Sum(dict => dict.Value + spaceBetweenColumn);
+                        rowData.Append(GenerateWhiteSpaces(spacesToAdd));
+                    }
+
+                    rowData.Append(GenerateWhiteSpaces(4)); //отступы до второй таблицы
+                    var correctRowCells = correctRows[j].Cells;
+                    for (var cell = 0; cell < correctRowCells.Length; cell++)
+                    {
+                        var spacesToAdd = maxCorrectDataLength[cell] - correctRowCells[cell].Value.Length + spaceBetweenColumn;
+                        rowData.Append("| " + correctRowCells[cell].Value + GenerateWhiteSpaces(spacesToAdd));
                     }
 
                     j++;
@@ -78,7 +83,7 @@ namespace TelegramBot.BLL.Services
             }
 
             //create a new image of the right size
-            Image retImg = new Bitmap((int)textSize.Width, (int)textSize.Height);
+            Image retImg = new Bitmap((int)textSize.Width + 200, (int)textSize.Height + 200);
             using (var drawing = Graphics.FromImage(retImg))
             {
                 //paint the background
@@ -92,10 +97,9 @@ namespace TelegramBot.BLL.Services
                 }
             }
             
-            var ms = new MemoryStream();
-            retImg.Save("C:\\Users\\OlenPC\\Desktop\\Auca\\TelegramBot\\test.png", ImageFormat.Png);
-            retImg.Save(ms, ImageFormat.Png);
-            return ms;
+            //var ms = new MemoryStream();
+            retImg.Save("C:\\Users\\OlenPC\\Desktop\\Auca\\TelegramBot\\test1.png", ImageFormat.Png);
+            //retImg.Save(ms, ImageFormat.Png);
         }
 
         private static Dictionary<int, int> GetMaxRowsDataLength(ResultRow[] userRows)

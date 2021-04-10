@@ -77,7 +77,7 @@ namespace TelegramBot.BLL.Services
             await Context.SaveChangesAsync();
             return new Response
             {
-                Message = Resources.CodeValidated, //response
+                Message = Resources.CodeValidated,
                 ChatId = update.Message.Chat.Id,
                 ParseMode = ParseMode.Default,
                 ResponseType = ResponseTypeEnum.NewMessage,

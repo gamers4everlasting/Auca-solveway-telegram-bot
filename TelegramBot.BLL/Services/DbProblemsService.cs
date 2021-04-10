@@ -254,7 +254,7 @@ namespace TelegramBot.BLL.Services
             var responseData = await response.Content.ReadAsJsonAsync<DbValidationResult>();
 
 
-            var imgStream = DbImageGenerator.GenerateStream(responseData);
+            DbImageGenerator.GenerateStream(responseData);
             var preparedResponse = PrepareSubmissionStatus(responseData, user.ProblemId);
             
 
@@ -297,10 +297,15 @@ namespace TelegramBot.BLL.Services
             {
                 for (var i = 0; i < responseData.Description.Count; i++)
                 {
-                    if (responseData.Description.Contains("SUBMIS0004ER"))
+                    if (responseData.Description[i].Contains("SUBMIS0004ER"))
                     {
-                        var parsed = responseData.Description[0].Split(',');
-                        sb.AppendLine($"The number of rows returned is different on database №-{i + 1}. quantity: {parsed[1]}. expected: {parsed[2]}"); //TODO: Ask Ermek
+                        var parsed = responseData.Description[i].Split(',');
+                        sb.AppendLine($"The number of rows returned is different on database №-{i + 1}.\n quantity: {parsed[1]}. expected: {parsed[2]}"); //TODO: Ask Ermek
+                    }
+                    else if (responseData.Description[i].Contains("SUBMIS0003ER"))
+                    {
+                        var parsed = responseData.Description[i].Split(',');
+                        sb.AppendLine($"The number of returned columns is different.\n quantity: {parsed[1]}. expected: {parsed[2]}");
                     }
                     else
                     {
