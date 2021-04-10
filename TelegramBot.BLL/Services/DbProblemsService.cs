@@ -254,7 +254,7 @@ namespace TelegramBot.BLL.Services
             var responseData = await response.Content.ReadAsJsonAsync<DbValidationResult>();
 
 
-            DbImageGenerator.GenerateStream(responseData);
+            DbImageGenerator.GenerateImageFromSolutionQuery(responseData);
             var preparedResponse = PrepareSubmissionStatus(responseData, user.ProblemId);
             
 

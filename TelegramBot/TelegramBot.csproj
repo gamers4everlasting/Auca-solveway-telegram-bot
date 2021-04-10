@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>a7593394-9475-4269-a7c4-aa261bb4b0b7</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,6 +20,21 @@
   <ItemGroup>
     <ProjectReference Include="..\TelegramBot.BLL\TelegramBot.BLL.csproj" />
     <ProjectReference Include="..\TelegramBot.DAL\TelegramBot.DAL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\launchSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

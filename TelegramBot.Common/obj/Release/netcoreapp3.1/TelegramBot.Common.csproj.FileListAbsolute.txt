@@ -1,0 +1,9 @@
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.Common\bin\Release\netcoreapp3.1\TelegramBot.Common.deps.json
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.Common\bin\Release\netcoreapp3.1\TelegramBot.Common.dll
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.Common\bin\Release\netcoreapp3.1\TelegramBot.Common.pdb
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.Common\obj\Release\netcoreapp3.1\TelegramBot.Common.csprojAssemblyReference.cache
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.Common\obj\Release\netcoreapp3.1\TelegramBot.Common.AssemblyInfoInputs.cache
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.Common\obj\Release\netcoreapp3.1\TelegramBot.Common.AssemblyInfo.cs
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.Common\obj\Release\netcoreapp3.1\TelegramBot.Common.csproj.CoreCompileInputs.cache
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.Common\obj\Release\netcoreapp3.1\TelegramBot.Common.dll
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.Common\obj\Release\netcoreapp3.1\TelegramBot.Common.pdb
