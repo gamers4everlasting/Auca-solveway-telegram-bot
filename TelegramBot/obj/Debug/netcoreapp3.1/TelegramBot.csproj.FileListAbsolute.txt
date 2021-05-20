@@ -169,3 +169,4 @@ C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\obj\Debug\netcoreapp3.1\Tel
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\bin\Debug\netcoreapp3.1\Helpers\Resources\Resources.resx
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\bin\Debug\netcoreapp3.1\ru\TelegramBot.BLL.resources.dll
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\bin\Debug\netcoreapp3.1\Properties\launchSettings.json
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot\bin\Debug\netcoreapp3.1\ky\TelegramBot.BLL.resources.dll

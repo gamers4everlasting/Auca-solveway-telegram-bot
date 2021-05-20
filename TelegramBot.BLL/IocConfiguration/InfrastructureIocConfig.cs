@@ -23,6 +23,7 @@ namespace TelegramBot.BLL.IocConfiguration
             services.AddTransient<IDbSubmissionsService, DbSubmissionsService>();
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IMessageHandleService, MessageHandleService>();
+            services.AddTransient<ICultureService, CultureService>();
             services.AddTelegramBotClient(configuration);
             return services;
         }

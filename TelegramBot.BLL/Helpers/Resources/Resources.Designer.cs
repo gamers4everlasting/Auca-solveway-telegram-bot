@@ -97,6 +97,15 @@ namespace TelegramBot.BLL.Helpers.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Language changed successfully.
+        /// </summary>
+        public static string LanguageChanged {
+            get {
+                return ResourceManager.GetString("LanguageChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to [solved] [code] [level] [subject area]-[name].
         /// </summary>
         public static string ListOfTasksDescription {
@@ -187,8 +196,7 @@ namespace TelegramBot.BLL.Helpers.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Welcome to Solveway judge!  
-        ///Please register/sign in at https://solveway.club/ 
+        ///   Looks up a localized string similar to  Please register/sign in at https://solveway.club/ 
         ///and enter secret code that is in you profile:.
         /// </summary>
         public static string Welcome {

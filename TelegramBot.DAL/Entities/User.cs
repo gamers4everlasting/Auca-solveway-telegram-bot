@@ -12,5 +12,6 @@ namespace TelegramBot.DAL.Entities
         public DateTime? BearerExpiresIn { get; set; }
         public ClientStateEnum State { get; set; }
         public int ProblemId { get; set; }
+        public LanguagesEnum Language { get; set; }
     }
 }

@@ -118,8 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Welcome" xml:space="preserve">
-    <value>Добро пожаловать в Solveway судью!  
-Пожалуйста зарегистрируйтесь или залогиньтесь в https://solveway.club/
+    <value>Пожалуйста зарегистрируйтесь или залогиньтесь в https://solveway.club/
 в разделе профиля есть секретный код, введите его сюда:</value>
   </data>
   <data name="CurrentlyInSystem" xml:space="preserve">
@@ -169,5 +168,8 @@
   </data>
   <data name="SubmissionListDescription" xml:space="preserve">
     <value>[решена] [код]-[название задачи]</value>
+  </data>
+  <data name="LanguageChanged" xml:space="preserve">
+    <value>Язык успешно изменен</value>
   </data>
 </root>

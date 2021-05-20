@@ -6,8 +6,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Polly;
+using TelegramBot.BLL.Extensions;
 using TelegramBot.BLL.IocConfiguration;
+using TelegramBot.Configurations;
 using TelegramBot.DAL.EF;
+using TelegramBot.DAL.Enums;
 using TelegramBot.Dto.Helper;
 
 namespace TelegramBot
@@ -39,6 +42,8 @@ namespace TelegramBot
                 client.BaseAddress = new Uri("https://api.solveway.club/");
             }).AddTransientHttpErrorPolicy(x => 
                 x.WaitAndRetryAsync(3, _=> TimeSpan.FromMilliseconds(300)));
+            services.AddCustomLocalization(LanguagesEnum.En.GetDescription(), LanguagesEnum.Ru.GetDescription(),
+                LanguagesEnum.Ky.GetDescription());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,6 +60,7 @@ namespace TelegramBot
             {
                 endpoints.MapControllers();
             });
+            app.UseCustomLocalization();
         }
     }
 }

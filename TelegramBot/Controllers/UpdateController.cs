@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Globalization;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
-using TelegramBot.BLL.Helpers.Resources;
 using TelegramBot.BLL.Interfaces;
 
 namespace TelegramBot.Controllers
@@ -12,16 +10,18 @@ namespace TelegramBot.Controllers
     public class UpdateController : Controller
     {
         private readonly ITelegramBotService _telegramBotService;
+        private readonly ICultureService _cultureService;
 
-        public UpdateController(ITelegramBotService telegramBotService)
+        public UpdateController(ITelegramBotService telegramBotService, ICultureService cultureService)
         {
             _telegramBotService = telegramBotService;
+            _cultureService = cultureService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Update update)
         {
-            setCulture(update);
+            _cultureService.SetCulture(update);
             
             try
             {
@@ -35,21 +35,5 @@ namespace TelegramBot.Controllers
             return Ok();
         }
 
-        private void setCulture(Update update)
-        {
-            if (update.CallbackQuery != null)
-            {
-                var culture = update.CallbackQuery.From.LanguageCode;
-                Resources.Culture = new CultureInfo(culture);
-                ErrorResources.Culture = new CultureInfo(culture);
-            }
-
-            if (update.Message != null)
-            {
-                var culture = update.Message.From.LanguageCode;
-                Resources.Culture = new CultureInfo(culture);
-                ErrorResources.Culture = new CultureInfo(culture);
-            }
-        }
     }
 }

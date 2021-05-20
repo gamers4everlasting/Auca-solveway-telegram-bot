@@ -9,6 +9,7 @@ using TelegramBot.BLL.Helpers.Enums;
 using TelegramBot.BLL.Helpers.Resources;
 using TelegramBot.BLL.Interfaces;
 using TelegramBot.BLL.Models.Generics;
+using TelegramBot.DAL.Enums;
 using static TelegramBot.BLL.Helpers.MessageTextTypes;
 
 namespace TelegramBot.BLL.Services
@@ -117,6 +118,9 @@ namespace TelegramBot.BLL.Services
                 nameof(PaginationEnum.DbSubmissionsLastPage) => await _dbSubmissionsService.GetDbSubmissionsLastPageAsync(update, int.Parse(command[1])),
                 nameof(SectionEnums.DbSubmissions) => await _dbSubmissionsService.GetDbSubmissionsByIdAsync(update, int.Parse(command[1])),
                 nameof(SectionEnums.TableResult) => await _dbProblemsService.GetTableResultPictureAsync(update),
+                nameof(LanguagesEnum.En) => await _userService.SetLanguage(update, LanguagesEnum.En),
+                nameof(LanguagesEnum.Ru) => await _userService.SetLanguage(update, LanguagesEnum.Ru),
+                nameof(LanguagesEnum.Ky) => await _userService.SetLanguage(update, LanguagesEnum.Ky),
                 _ => new Response()
             };
         }

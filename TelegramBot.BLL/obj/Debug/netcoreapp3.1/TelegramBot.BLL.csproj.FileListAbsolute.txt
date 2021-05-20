@@ -32,3 +32,9 @@ C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\obj\Debug\netcoreapp3.1
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\obj\Debug\netcoreapp3.1\TelegramBot.BLL.Helpers.Resources.Resources.ru.resources
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\obj\Debug\netcoreapp3.1\TelegramBot.BLL.csproj.GenerateResource.cache
 C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\obj\Debug\netcoreapp3.1\ru\TelegramBot.BLL.resources.dll
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\bin\Debug\netcoreapp3.1\ky\TelegramBot.BLL.resources.dll
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\obj\Debug\netcoreapp3.1\TelegramBot.BLL.Helpers.Resources.ErrorResources.ky.resources
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\obj\Debug\netcoreapp3.1\TelegramBot.BLL.Helpers.Resources.Resources.ky.resources
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\obj\Debug\netcoreapp3.1\ky\TelegramBot.BLL.resources.dll
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\obj\Debug\netcoreapp3.1\ky\TelegramBot.BLL.resources.cs
+C:\Users\OlenPC\Desktop\Auca\TelegramBot\TelegramBot.BLL\obj\Debug\netcoreapp3.1\ru\TelegramBot.BLL.resources.cs

@@ -32,6 +32,9 @@ namespace TelegramBot.DAL.Migrations
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
+
                     b.Property<int>("ProblemId")
                         .HasColumnType("int");
 
